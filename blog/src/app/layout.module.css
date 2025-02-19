@@ -1,0 +1,52 @@
+.layoutHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #C7BEBE;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.layoutHeader a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.layoutHeader a:hover {
+    text-decoration: underline;
+}
+
+.layoutHeader .logo  {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #333;
+    letter-spacing: 1px;
+    margin-left: 5px
+  }
+
+.headerRight {
+    display: flex;
+    align-items: center;
+}
+
+.themeToggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    margin-right: 15px;
+    margin-top: 6px;
+    color: #333;
+}
+
+.about {
+    margin-right: 10px;
+}
+
+body {
+    padding-top: 50px;
+}

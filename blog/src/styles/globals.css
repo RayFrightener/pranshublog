@@ -8,9 +8,13 @@
 /* Dark mode preferred in browser*/
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #2C2C2C; /* Dark background */
+    --background: #908A8A; /* Dark background */
     --foreground: #ededed; /* Light text color */
   }
+}
+[data-theme="dark"] {
+  --background: #908A8A;
+  --foreground: #ededed;
 }
 
 html,
