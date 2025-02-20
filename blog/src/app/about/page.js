@@ -10,6 +10,7 @@ export default function About() {
                     manage databases, query them, write APIs for software
                     components to exchange data and design and create user interfaces, just like this one *soft blink*.
                 </p>
+                <p className={styles.smallText}>If you want a better understanding of what these terms mean click <a>here</a>.</p>
                 <p>Below are the <b>projects</b> I've created!</p>
                 <ul className={styles.projectList}>
                     <li><a href="https://dailytasklogger.vercel.app/" target="_blank" rel="noopener noreferrer">The Daily Task Logger</a></li> 
@@ -23,7 +24,7 @@ export default function About() {
                   * rel="noreferrer" prevents the browser from sending the Referrer header to the new page. 
                   * This can help to protect privacy by not revealing the URL of the original page.
                   */}
-                <p className={styles.aboutSuggestion}>These links are safe to click and visit!</p>
+                <p className={styles.smallText}>These links are safe to click and visit!</p>
             </main>
         </div>
     )
