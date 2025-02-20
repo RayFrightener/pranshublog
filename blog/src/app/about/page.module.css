@@ -6,3 +6,34 @@
     max-width: 800px;
     margin: 0 auto;
 }
+.main p { 
+    margin-bottom: 15px;
+}
+
+.main h1 {
+    margin-bottom: 5px;
+}
+
+.projectList {
+    list-style-type: none;
+    padding:0;
+}
+
+.projectList li {
+    margin: 10px 0;
+}
+
+.projectList a {
+    text-decoration: none;
+    color: #5D4037;
+    font-weight: bold;
+}
+
+.projectList a:hover {
+    text-decoration: underline;
+}
+
+.aboutSuggestion {
+    margin-top: 5px;
+    font-size: 0.7rem;
+}

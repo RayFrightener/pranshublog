@@ -25,15 +25,41 @@
     margin-left: 5px;
   }
 
-.headerRight {
+.about {
+    margin-right: 20px;
+}
+
+.footer {
+    background-color: var(--header-background);
+    padding: 2px;
+    text-align: center;
+    position:fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.socialLinks {
     display: flex;
+    justify-content: center;
     align-items: center;
 }
 
-.about {
-    margin-right: 10px;
+.socialLinks a {
+    margin: 0 6px;
+    margin-top: 4px;
+    color: var(--header-anchor-color);
+    font-size: 17px;
+}
+
+.socialLinks a:hover {
+    color: #5D4037;
 }
 
 body {
     padding-top: 50px;
+}
+
+.content {
+    padding-top: 60px; /* Ensure content is not hidden behind the fixed header */
+    padding-bottom: 80px; /* Ensure content is not hidden behind the fixed footer */
 }
