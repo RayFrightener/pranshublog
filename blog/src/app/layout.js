@@ -11,7 +11,7 @@ export default function RootLayout({ children }) {
         <title>Pranshu's Blog</title>
         <meta name="description" content="Technology blog" />
       </head>
-      <body>
+      <body className={styles.layoutBody}>
         <header className={styles.layoutHeader}>
           <a href="/" className={styles.logo}>Pranshu</a>
           <a href="/about" className={styles.about}>About</a>
