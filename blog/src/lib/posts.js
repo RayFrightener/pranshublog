@@ -5,6 +5,7 @@ import { remark } from 'remark';
 import rehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import rehypeSlug from 'rehype-slug';
+import rehypeExternalLinks from 'rehype-external-links';
 
 const postsDirectory = path.join(process.cwd(), '/src/posts');
 
@@ -50,6 +51,7 @@ export async function getPostData(id) {
     const processedContent = await remark()
     .use(rehype)
     .use(rehypeSlug)
+    .use(rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] })
     .use(rehypeStringify)
     .process(matterResult.content);
     const contentHtml = processedContent.toString();

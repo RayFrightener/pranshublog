@@ -56,5 +56,12 @@
   }
 
   .post li {
-    margin: 5px 0;
+    margin: 10px 5px;
   }
+
+  /* Responsive adjustments */
+@media (max-width: 768px) {
+  .post {
+    padding: 25px;
+  }
+}

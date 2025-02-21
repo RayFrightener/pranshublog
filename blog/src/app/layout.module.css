@@ -63,3 +63,11 @@ body {
     padding-top: 60px; /* Ensure content is not hidden behind the fixed header */
     padding-bottom: 80px; /* Ensure content is not hidden behind the fixed footer */
 }
+
+/* Add this CSS to handle the offset for the fixed header */
+:target::before {
+    content: "";
+    display: block;
+    height: 55px; /* Adjust this value to match the height of your fixed header */
+    margin-top: -55px; /* Adjust this value to match the height of your fixed header */
+}

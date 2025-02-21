@@ -61,3 +61,14 @@
 .main small {
   color: #666;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .page {
+    padding: 25px;
+  }
+
+  .main {
+    padding: 25px;
+  }
+}
