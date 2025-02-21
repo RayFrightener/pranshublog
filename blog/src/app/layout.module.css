@@ -65,7 +65,7 @@
 }
 
 /* Add this CSS to handle the offset for the fixed header */
-:target::before {
+.layoutBody :target::before {
     content: "";
     display: block;
     height: 55px; /* Adjust this value to match the height of your fixed header */
