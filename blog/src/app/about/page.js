@@ -15,7 +15,7 @@ export default function About() {
                 <ul className={styles.projectList}>
                     <li><a href="https://dailytasklogger.vercel.app/" target="_blank" rel="noopener noreferrer">The Daily Task Logger</a></li> 
                     <li><a href="https://yoga-shlokas.vercel.app/" target="_blank" rel="noopener noreferrer">Yoga Verses</a></li>
-                    <li><a href="" target="_blank" rel="noopener noreferrer">My Personal Website</a></li>
+                    <li><a href="https://pranshublog-rho.vercel.app/" target="_blank" rel="noopener noreferrer">My Personal Website</a></li>
                 </ul>
                  {/**
                   * target="_blank" this value specifies that the linked document be opened in a new tab or new window
