@@ -1,5 +1,6 @@
 import { getAllPostIds, getPostData } from '@/lib/posts';
 import styles from './page.module.css';
+
 export async function generateStaticParams() {
   const paths = getAllPostIds();
   return paths.map((path) => path.params);

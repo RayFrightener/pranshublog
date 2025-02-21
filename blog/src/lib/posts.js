@@ -2,7 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
-import html from 'remark-html';
+import rehype from 'remark-rehype';
+import rehypeStringify from 'rehype-stringify';
+import rehypeSlug from 'rehype-slug';
 
 const postsDirectory = path.join(process.cwd(), '/src/posts');
 
@@ -46,8 +48,10 @@ export async function getPostData(id) {
     const matterResult = matter(fileContents);
 
     const processedContent = await remark()
-        .use(html)
-        .process(matterResult.content);
+    .use(rehype)
+    .use(rehypeSlug)
+    .use(rehypeStringify)
+    .process(matterResult.content);
     const contentHtml = processedContent.toString();
 
     return {

@@ -11,6 +11,10 @@
     color: #333;
   }
   
+  .post h2, .post h3, .post h4, .post h5, .post h6 {
+    margin: 15px 0;
+    color: #333;
+  }
   .post p {
     margin-bottom: 15px;
     line-height: 1.6;
@@ -28,4 +32,29 @@
   
   .post small {
     color: #666;
+  }
+
+  .post hr {
+    margin: 10px 0;
+    border: 0;
+    border-top: 1px solid #ccc;
+  }
+
+  .post code {
+    font-size: 1rem;
+    background-color: var(--header-background); 
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  .post pre {
+    font-size: 1rem;
+    background-color: var(--header-background); 
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+
+  .post li {
+    margin: 5px 0;
   }
