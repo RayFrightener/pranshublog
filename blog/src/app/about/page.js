@@ -4,7 +4,7 @@ export default function About() {
     return (
         <div className={styles.page}>
             <main className={styles.main}>
-                <h1>Jelloo!</h1>
+                <h1>Hello!</h1>
                 <p>Here you will find information about what I do and my values.</p>
                 <p>I am skilled in developing web applications. I know how to 
                     manage databases, query them, write APIs for software
