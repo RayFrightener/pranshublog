@@ -4,11 +4,11 @@ export default function About() {
     return (
         <div className={styles.page}>
             <main className={styles.main}>
-                <h1>Hi, love!</h1>
+                <h1>Jelloo!</h1>
                 <p>Here you will find information about what I do and my values.</p>
                 <p>I am skilled in developing web applications. I know how to 
                     manage databases, query them, write APIs for software
-                    components to exchange data and design and create user interfaces, just like this one *soft blink*.
+                    components to exchange data and design and create user interfaces.
                 </p>
                 {/* <p className={styles.smallText}>If you want a better understanding of what these terms mean click <a href="posts/basicTerminology">here</a>.</p> */}
                 <p>Below are the <b>projects</b> I've created!</p>
