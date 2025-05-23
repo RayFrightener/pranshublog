@@ -4,28 +4,25 @@ export default function About() {
     return (
         <div className={styles.page}>
             <main className={styles.main}>
-                <h1>Hello!</h1>
-                <p>Here you will find information about what I do and my values.</p>
-                <p>I am skilled in developing web applications. I know how to 
-                    manage databases, query them, write APIs for software
-                    components to exchange data and design and create user interfaces.
+                <h1>Hi, I’m Pranshu</h1>
+                <p>
+                    I’m a software engineer focused on building clean, full-stack web applications that are scalable, reliable, and user-friendly.
                 </p>
-                {/* <p className={styles.smallText}>If you want a better understanding of what these terms mean click <a href="posts/basicTerminology">here</a>.</p> */}
-                <p>Below are the <b>projects</b> I've created!</p>
+                <p>
+                    I specialize in database design, backend API development, and intuitive front-end interfaces using technologies like Next.js, Node.js, and PostgreSQL.
+                    I enjoy working on real-world problems and writing code that serves a purpose.
+                </p>
+                <p>
+                    My goal is to join a team where I can contribute meaningfully from day one, grow as a developer, and build software that matters.
+                </p>
+                <p>
+                    Below are some of the <b>projects</b> I’ve built — each one reflects what I care about: clarity, simplicity, and making an impact through software.
+                </p>
                 <ul className={styles.projectList}>
                     <li><a href="https://dailytasklogger.vercel.app/" target="_blank" rel="noopener noreferrer">The Daily Task Logger</a></li> 
                     <li><a href="https://yoga-shlokas.vercel.app/" target="_blank" rel="noopener noreferrer">Yoga Verses</a></li>
                     <li><a href="https://pranshublog-rho.vercel.app/" target="_blank" rel="noopener noreferrer">My Personal Website</a></li>
                 </ul>
-                 {/**
-                  * target="_blank" this value specifies that the linked document be opened in a new tab or new window
-                  * rel="nopener" prevents the new page from being able to access the window.opener property, helps
-                  * to protect against certain types of phishing attacks where the new page could potentially
-                  * manipulate the original page
-                  * rel="noreferrer" prevents the browser from sending the Referrer header to the new page. 
-                  * This can help to protect privacy by not revealing the URL of the original page.
-                  */}
-                {/* <p className={styles.smallText}>These links are safe to click and visit!</p> */}
             </main>
         </div>
     )
