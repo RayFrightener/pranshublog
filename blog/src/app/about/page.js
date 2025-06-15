@@ -20,7 +20,7 @@ export default function About() {
                     Below are some of the <b>projects</b> I’ve built — each one reflects what I care about: clarity, simplicity, and making an impact through software.
                 </p>
                 <ul className={styles.projectList}>
-                    <li><a href="https://github.com/RayFrightener/youarefree" target="_blank" rel="noopener noreferrer">Unbound – A full-stack reflection platform (In Progress)</a></li>
+                    <li><a href="https://iamtruth.me" target="_blank" rel="noopener noreferrer">Unbound</a></li>
                     <li><a href="https://dailytasklogger.vercel.app/" target="_blank" rel="noopener noreferrer">The Daily Task Logger</a></li> 
                     <li><a href="https://yoga-shlokas.vercel.app/" target="_blank" rel="noopener noreferrer">Yoga Verses</a></li>
                     <li><a href="https://pranshublog-rho.vercel.app/" target="_blank" rel="noopener noreferrer">My Personal Website</a></li>
