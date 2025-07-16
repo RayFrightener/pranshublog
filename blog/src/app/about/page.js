@@ -8,7 +8,7 @@ export default function About() {
                 <h1 className={styles.header}>
                     <span>Hello! My name is Pranshu</span>
                     <a
-                        href="/softwareEngineerPranshuChawlaResume2025.docx                        feature(about): add downloadable resume link with icon.pdf"
+                        href="/softwareEngineerPranshuChawlaResume2025.docx.pdf"
                         className={styles.resumeLink}
                         target="_blank"
                         rel="noopener noreferrer"
