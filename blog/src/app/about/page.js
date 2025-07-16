@@ -1,11 +1,23 @@
 import styles from "./page.module.css";
+import { IoDocument } from "react-icons/io5";
 
 export default function About() {
     return (
         <div className={styles.page}>
             <main className={styles.main}>
-                <h1>Hi — my name is Pranshu</h1>
-
+                <h1 className={styles.header}>
+                    <span>Hello! My name is Pranshu</span>
+                    <a
+                        href="/softwareEngineerPranshuChawlaResume2025.docx                        feature(about): add downloadable resume link with icon.pdf"
+                        className={styles.resumeLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                    >
+                        <IoDocument style={{ marginRight: "0.4em" }} />
+                        Resume
+                    </a>
+                </h1>
                 <p>
                     I’m a software engineer focused on building clean, full-stack web applications that are scalable, reliable, and user-friendly.
                 </p>

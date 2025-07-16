@@ -41,3 +41,26 @@
     margin-top: 5px;
     font-size: 0.7rem;
 }
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.resumeLink {
+    display: inline-flex;
+    align-items: center;
+    color: #e65100;
+    font-weight: 500;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: color 0.2s;
+    border-radius: 4px;
+    padding: 0.2em 0.6em;
+}
+.resumeLink:hover {
+    color: #bf360c;
+    text-decoration: underline;
+}
