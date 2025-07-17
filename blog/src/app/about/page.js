@@ -6,30 +6,33 @@ export default function About() {
         <div className={styles.page}>
             <main className={styles.main}>
                 <h1 className={styles.header}>
-                    <span>Hello! My name is Pranshu</span>
-                    <a
-                        href="/softwareEngineerPranshuChawlaResume2025.docx.pdf"
-                        className={styles.resumeLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        download
-                    >
-                        <IoDocument style={{ marginRight: "0.4em" }} />
-                        Resume
-                    </a>
+                <span>Hey, I'm Pranshu 👋</span>
+                <a
+                    href="/softwareEngineerPranshuChawlaResume2025.docx.pdf"
+                    className={styles.resumeLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                >
+                    <IoDocument style={{ marginRight: "0.4em" }} />
+                    Resume
+                </a>
                 </h1>
+                
                 <p>
-                    I’m a software engineer focused on building clean, full-stack web applications that are scalable, reliable, and user-friendly.
+                I’m a full-stack software engineer who loves building clean, purposeful web apps — the kind that don’t just work, but feel right.
                 </p>
                 <p>
-                    I specialize in database design, backend API development, and intuitive front-end interfaces using technologies like Next.js, Node.js, and PostgreSQL.
-                    I enjoy working on real-world problems and writing code that serves a purpose.
+                My sweet spot? Designing solid database schemas, crafting smooth APIs, and building snappy UIs with tools like Next.js, Node.js, and PostgreSQL. I’m big on simplicity, scalability, and keeping things human-friendly.
                 </p>
                 <p>
-                    My goal is to join a team where I can contribute meaningfully from day one, grow as a developer, and build software that matters.
+                Whether it's solving real-world problems or just writing elegant code that gets out of the user's way, I’m here for it. I care about the why as much as the how.
                 </p>
                 <p>
-                    Below are some of the <b>projects</b> I’ve built — each one reflects what I care about: clarity, simplicity, and making an impact through software.
+                Right now, I’m looking for a full-time role as a Full-Stack or Backend Software Engineer — somewhere I can contribute meaningfully, grow fast, and build things that matter.
+                </p>
+                <p>
+                Check out some of my <b>projects</b> — they're built with care, clarity, and a strong desire to make tech a little better for everyone.
                 </p>
                 <ul className={styles.projectList}>
                     <li><a href="https://iamtruth.me" target="_blank" rel="noopener noreferrer">Unbound</a></li>
@@ -37,6 +40,17 @@ export default function About() {
                     <li><a href="https://yoga-shlokas.vercel.app/" target="_blank" rel="noopener noreferrer">Yoga Verses</a></li>
                     <li><a href="https://pranshublog-rho.vercel.app/" target="_blank" rel="noopener noreferrer">My Personal Website</a></li>
                 </ul>
+                <hr style={{ margin: "2rem 0" }} />
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <a
+                    href="https://calendly.com/pranshuchawla19/30min"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.scheduleBtn}
+                >
+                    Schedule a Meeting
+                </a>
+            </div>
             </main>
         </div>
     )

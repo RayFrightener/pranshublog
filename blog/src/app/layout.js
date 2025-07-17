@@ -4,6 +4,9 @@ import "../styles/globals.css";
 import styles from "./layout.module.css";
 import { FaLinkedin, FaGithub } from "react-icons/fa";
 import { Analytics } from "@vercel/analytics/react"
+import { IoMail } from "react-icons/io5";
+
+
 
 export default function RootLayout({ children }) {
   return (
@@ -28,6 +31,14 @@ export default function RootLayout({ children }) {
             <a href="https://github.com/RayFrightener" target="_blank" rel="noopener noreferrer">
               <FaGithub />
             </a>
+            <a
+            href="https://mail.google.com/mail/?view=cm&to=pranshuchawla19@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Email me via Gmail"
+          >
+            <IoMail />
+          </a>
           </div>
         </footer>
         <Analytics />

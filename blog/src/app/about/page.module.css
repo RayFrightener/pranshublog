@@ -64,3 +64,23 @@
     color: #bf360c;
     text-decoration: underline;
 }
+
+.scheduleBtn {
+    background: #5d4037;
+    color: #f5e9da !important; /* Ensure white text */
+    padding: 0.5em 1.2em;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    font-size: 1rem;
+    margin-left: 1rem;
+    box-shadow: 0 1px 4px rgba(93, 64, 55, 0.08);
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+.scheduleBtn:hover {
+    background: #7e573c;
+    color: #fffbe7 !important;
+}
