@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link";
 import "../styles/globals.css";
 import styles from "./layout.module.css";
 import { FaLinkedin, FaGithub } from "react-icons/fa";
@@ -17,8 +18,8 @@ export default function RootLayout({ children }) {
       </head>
       <body className={styles.layoutBody}>
         <header className={styles.layoutHeader}>
-          <a href="/" className={styles.logo}>Pranshu</a>
-          <a href="/about" className={styles.about}>About</a>
+          <Link href="/" className={styles.logo}>Pranshu</Link>
+          <Link href="/about" className={styles.about}>About</Link>
         </header>
         <div className={styles.content}>
           {children}
@@ -32,10 +33,8 @@ export default function RootLayout({ children }) {
               <FaGithub />
             </a>
             <a
-            href="https://mail.google.com/mail/?view=cm&to=pranshuchawla19@gmail.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Email me via Gmail"
+            href="mailto:pranshuchawla19@gmail.com"
+            title="Email me"
           >
             <IoMail />
           </a>
