@@ -39,9 +39,7 @@
 .projectCard a:hover {
     text-decoration: underline;
 }
-a:hover {
-    text-decoration: underline;
-}
+
 .smallText {
     margin-top: 5px;
     font-size: 0.7rem;

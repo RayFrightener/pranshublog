@@ -22,20 +22,20 @@ export default function About() {
                 
                 <p><strong>Full-Stack Software Engineer</strong> building clean, human-centered web apps — front to back, idea to deployment.</p>
 
-  <p>I enjoy designing solid database schemas, crafting smooth APIs, and building fast, intuitive UIs. My go-to tools are <strong>Next.js, Node.js, and PostgreSQL</strong>, with TypeScript tying it all together.</p>
+                <p>I enjoy designing solid database schemas, crafting smooth APIs, and building fast, intuitive UIs. My go-to tools are <strong>Next.js, Node.js, and PostgreSQL</strong>, with TypeScript tying it all together.</p>
 
-  <p>I'm big on clarity, scalability, and building tech that feels good to use. Whether it's solving real-world problems or writing elegant code that gets out of the user’s way — I’m here for it.</p>
+                <p>I'm big on clarity, scalability, and building tech that feels good to use. Whether it's solving real-world problems or writing elegant code that gets out of the user’s way — I’m here for it.</p>
 
-  <p><strong>Currently open to full-time roles</strong> as a Full-Stack or Backend Software Engineer — especially where I can contribute meaningfully, grow fast, and help bring thoughtful products to life.</p>
+                <p><strong>Currently open to full-time roles</strong> as a Full-Stack or Backend Software Engineer — especially where I can contribute meaningfully, grow fast, and help bring thoughtful products to life.</p>
 
-  <p>Take a look at some of my <strong>projects</strong> below — each one is built with care, clarity, and a strong desire to make tech a little better for everyone.</p>
+                <p>Take a look at some of my <strong>projects</strong> below — each one is built with care, clarity, and a strong desire to make tech a little better for everyone.</p>
 
-  <p>If you’d like to explore the code behind them, visit my <a href="https://github.com/RayFrightener" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+                <p>If you’d like to explore the code behind them, visit my <a href="https://github.com/RayFrightener" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
                 {/* Project Cards */}
                 <div className={styles.projectGrid}>
                     {/* First Project */}
                     <div className={styles.projectCard}>
-                        <h3>Unbound</h3>
+                        <h3><a href="https://iamtruth.me" target="_blank" rel="noopener noreferrer">Unbound</a></h3>
                         <p className={styles.projectSubtitle}>
                             A minimalist platform to share uplifting thoughts and connect through daily reflections.
                         </p>
