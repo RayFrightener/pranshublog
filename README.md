@@ -46,7 +46,7 @@ Interested in my experience? [Download my resume](https://pranshublog-rho.vercel
 
 ---
 
-Feel free to explore the code,
+Feel free to explore the code
 
 ## Commit Message Categories
 
