@@ -30,7 +30,7 @@ Welcome! This is my personal technology blog built with Next.js and React. Here,
 
 ## Resume
 
-Interested in my experience? [Download my resume](prashublog/blog/public/softwareEngineerPranshuChawlaResume2025.docx.pdf).
+Interested in my experience? [Download my resume](https://pranshublog-rho.vercel.app/softwareEngineerPranshuChawlaResume2025.docx.pdf).
 
 ## For Recruiters
 
