@@ -2,7 +2,7 @@
 
 /* Light mode preferred in browser*/
 :root {
-  --background: #DCD9D9; /* light background */
+  --background: #D0CCCC; /* light background */
   --foreground: #171717; /* Dark text color */
   --header-background: #C7BEBE;
   --header-anchor-color: #333;
@@ -10,7 +10,7 @@
 /* Dark mode preferred in browser*/
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #B8B2B2; /* Dark background */
+    --background: #D0CCCC; /* Dark background */
     --foreground: #171717; /* Light text color */
     --header-background: #A59E9E;
     --header-anchor-color: #171717;
