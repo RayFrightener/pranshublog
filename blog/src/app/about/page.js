@@ -31,6 +31,17 @@ export default function About() {
                 <p>Take a look at some of my <strong>projects</strong> below — each one is built with care, clarity, and a strong desire to make tech a little better for everyone.</p>
 
                 <p>If you’d like to explore the code behind them, visit my <a href="https://github.com/RayFrightener" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+                
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <a
+                    href="https://calendly.com/pranshuchawla19/30min"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.scheduleBtn}
+                >
+                    Schedule a Meeting
+                </a>
+                </div>
                 {/* Project Cards */}
                 <div className={styles.projectGrid}>
                     {/* First Project */}
@@ -109,6 +120,47 @@ export default function About() {
                     </div>
                     {/* Third Project */}
                     <div className={styles.projectCard}>
+                        <h3>
+                            <a href="https://github.com/RayFrightener/kindlore" target="_blank" rel="noopener noreferrer">
+                                Kindlore – [In Progress]
+                            </a>
+                        </h3>
+                        <p>
+                            A personal knowledge platform to organize, reflect on, and enrich Kindle highlights and book notes.
+                        </p>
+                        <span className={styles.projectRole}>
+                            Developing solo – full-stack
+                        </span>
+                        <div className={styles.projectGiftWrapper}>
+                            <Image src="/image.png" alt="Kindlore demo" className={styles.projectGif} width={1000} height={432} unoptimized />
+                        </div>
+
+                        <h4 className={styles.projectSectionTitle}>Key Features</h4>
+                        <ul>
+                            <li>Secure Google-authenticated sign-in with encrypted data storage</li>
+                            <li>Upload and manage Kindle clippings with deduplication and reflection support</li>
+                            <li>Structured note-taking flow with distraction-free reading UI</li>
+                            <li>Mobile-friendly, accessible design using Tailwind CSS and modular components</li>
+                        </ul>
+
+                        <h4 className={styles.projectSectionTitle}>Tech Stack</h4>
+                        <p className={styles.techStack}>
+                            Next.js (App Router), React, TypeScript, PostgreSQL, Prisma, Auth.js, Tailwind CSS
+                        </p>
+
+                        {/* Optional live link - disable if not ready */}
+                        <a
+                            className={styles.projectCTA}
+                            href="https://github.com/RayFrightener/kindlore"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Visit repository →
+                        </a>
+                    </div>
+
+                    {/* Fourth Project */}
+                    <div className={styles.projectCard}>
                         <h3><a href="https://yoga-shlokas.vercel.app/" target="_blank" rel="noopener noreferrer">Yoga Verses</a></h3>
                         <p>A spiritual reading companion for the Bhagavad Gita — simple, serene, and accessible.</p>
                         <span className={styles.projectRole}>
@@ -136,7 +188,7 @@ export default function About() {
                             Visit live site →
                         </a>
                     </div>
-                    {/* Fourth Project */}
+                    {/* Fifth Project */}
                     <div className={styles.projectCard}>
                         <h3><a href="https://pranshublog-rho.vercel.app/" target="_blank" rel="noopener noreferrer">My Personal Website</a></h3>
                         <p>A living digital space to explore my projects, thoughts, and inspirations.</p>
