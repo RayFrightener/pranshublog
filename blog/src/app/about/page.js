@@ -9,7 +9,7 @@ export default function About() {
         <h1 className={styles.header}>
           <span>Hey, I'm Pranshu 👋</span>
           <a
-            href="/softwareEngineerPranshuChawlaResume2025.docx.pdf"
+            href="/portfolioSoftwareEngineerPranshuChawlaResume2025.docx.pdf"
             className={styles.resumeLink}
             target="_blank"
             rel="noopener noreferrer"
