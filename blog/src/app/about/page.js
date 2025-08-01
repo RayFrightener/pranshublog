@@ -202,7 +202,7 @@ export default function About() {
               Kindle highlights and book notes.
             </p>
             <span className={styles.projectRole}>
-              Developing solo – full-stack
+              Built and deployed solo – full-stack
             </span>
             <div className={styles.projectGiftWrapper}>
               <Image
