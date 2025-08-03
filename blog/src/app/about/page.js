@@ -206,7 +206,7 @@ export default function About() {
             </span>
             <div className={styles.projectGiftWrapper}>
               <Image
-                src="/image.png"
+                src="/kindlore.gif"
                 alt="Kindlore demo"
                 className={styles.projectGif}
                 width={1000}
