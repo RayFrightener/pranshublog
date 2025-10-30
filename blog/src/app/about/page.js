@@ -28,8 +28,8 @@ export default function About() {
         <p>
           I enjoy designing solid database schemas, crafting smooth APIs, and
           building fast, intuitive UIs. My go-to tools are{" "}
-          <strong>Next.js, Node.js, and PostgreSQL</strong>, with TypeScript
-          tying it all together.
+          <strong>Next.js, React, and PostgreSQL</strong>, with TypeScript tying
+          it all together.
         </p>
 
         <p>
