@@ -22,7 +22,7 @@ export default function About() {
 
         <p>
           <strong>Full-Stack Software Engineer</strong> building clean,
-          human-centered web apps — front to back, idea to deployment.
+          human-centered web apps, front to back, idea to deployment.
         </p>
 
         <p>
@@ -35,18 +35,18 @@ export default function About() {
         <p>
           I'm big on clarity, scalability, and building tech that feels good to
           use. Whether it's solving real-world problems or writing elegant code
-          that gets out of the user’s way — I’m here for it.
+          that gets out of the user’s way, I’m here for it.
         </p>
 
         <p>
           <strong>Currently open to full-time roles</strong> as a Full-Stack or
-          Backend Software Engineer — especially where I can contribute
+          Backend Software Engineer, especially where I can contribute
           meaningfully, grow fast, and help bring thoughtful products to life.
         </p>
 
         <p>
-          Take a look at some of my <strong>projects</strong> below — each one
-          is built with care, clarity, and a strong desire to make tech a little
+          Take a look at some of my <strong>projects</strong> below, each one is
+          built with care, clarity, and a strong desire to make tech a little
           better for everyone.
         </p>
 
