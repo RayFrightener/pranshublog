@@ -21,7 +21,7 @@ export default function About() {
         </h1>
 
         <p>
-          <strong>Full-Stack Software Engineer</strong> building clean,
+          <strong>A Full-Stack Software Engineer</strong> building clean,
           human-centered web apps, front to back, idea to deployment.
         </p>
 
