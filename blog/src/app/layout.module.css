@@ -1,73 +1,77 @@
 .layoutHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .layoutHeader a {
-    text-decoration: none;
-    font-size: 1.2rem;
+  text-decoration: none;
+  font-size: 1.2rem;
 }
 
 .layoutHeader a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-.layoutHeader .logo  {
-    font-weight: 700;
-    font-size: 1.7rem;
-    letter-spacing: 1px;
-    margin-left: 5px;
-  }
+.layoutHeader .logo {
+  font-weight: 700;
+  font-size: 1.7rem;
+  letter-spacing: 1px;
+  margin-left: 5px;
+}
 
 .about {
-    margin-right: 20px;
+  margin-right: 20px;
 }
 
 .footer {
-    background-color: var(--header-background);
-    padding: 2px;
-    text-align: center;
-    position:fixed;
-    bottom: 0;
-    width: 100%;
+  background-color: var(--header-background);
+  padding: 2px;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
 
 .socialLinks {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .socialLinks a {
-    margin: 0 6px;
-    margin-top: 4px;
-    color: var(--header-anchor-color);
-    font-size: 17px;
+  margin: 0 6px;
+  margin-top: 4px;
+  color: var(--header-anchor-color);
+  font-size: 17px;
 }
 
 .socialLinks a:hover {
-    color: #5D4037;
+  color: #5d4037;
 }
 
 .layoutBody {
-    padding-top: 50px;
+  padding-top: 50px;
+}
+
+.noPadding {
+  padding-top: 0 !important;
 }
 
 .content {
-    padding-top: 60px; /* Ensure content is not hidden behind the fixed header */
-    padding-bottom: 80px; /* Ensure content is not hidden behind the fixed footer */
+  padding-top: 0; /* Remove top padding for dashboard */
+  padding-bottom: 0; /* Remove bottom padding for dashboard */
 }
 
 /* Add this CSS to handle the offset for the fixed header */
 .layoutBody :target::before {
-    content: "";
-    display: block;
-    height: 55px; /* Adjust this value to match the height of your fixed header */
-    margin-top: -55px; /* Adjust this value to match the height of your fixed header */
+  content: "";
+  display: block;
+  height: 55px; /* Adjust this value to match the height of your fixed header */
+  margin-top: -55px; /* Adjust this value to match the height of your fixed header */
 }
