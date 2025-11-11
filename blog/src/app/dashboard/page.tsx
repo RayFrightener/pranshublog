@@ -565,7 +565,7 @@ function ProjectWorkspace({
 }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "planning" | "tracking" | "thoughts" | "journal"
+    "design-doc" | "tracking" | "thoughts" | "journal"
   >("tracking"); // Changed default to "tracking"
 
   return (
@@ -603,7 +603,7 @@ function ProjectWorkspace({
         <div className="flex gap-2 border-b border-[#867979] overflow-x-auto">
           {[
             { id: "tracking", label: "Tracking" }, // First
-            { id: "planning", label: "Planning" }, // Second
+            { id: "design-doc", label: "Design Document" }, // Second
             { id: "thoughts", label: "Thoughts" },
             { id: "journal", label: "Journal" },
           ].map((tab) => (
@@ -626,8 +626,8 @@ function ProjectWorkspace({
         {activeTab === "tracking" && (
           <TrackingTab project={project} onUpdate={onUpdate} />
         )}
-        {activeTab === "planning" && (
-          <PlanningTab project={project} onUpdate={onUpdate} />
+        {activeTab === "design-doc" && (
+          <DesignDocumentTab project={project} onUpdate={onUpdate} />
         )}
         {activeTab === "thoughts" && (
           <ThoughtsTab project={project} onUpdate={onUpdate} />
@@ -652,21 +652,14 @@ function ProjectWorkspace({
   );
 }
 
-// Planning Tab Component
-function PlanningTab({
+// Design Document Tab Component
+function DesignDocumentTab({
   project,
   onUpdate,
 }: {
   project: Project;
   onUpdate: (project: Project) => void;
 }) {
-  const [activeSubTab, setActiveSubTab] = useState<
-    "features" | "tasks" | "requirements"
-  >("features");
-  const [expandedFeatureId, setExpandedFeatureId] = useState<string | null>(
-    null
-  );
-  const [editingFeatureId, setEditingFeatureId] = useState<string | null>(null);
 
   // Feature form state
   const [newFeatureName, setNewFeatureName] = useState("");
@@ -890,36 +883,36 @@ function PlanningTab({
     }
   };
 
+  // Calculate task completion for features
+  const getFeatureTaskStats = (feature: Feature) => {
+    const total = feature.tasks.length;
+    const completed = feature.tasks.filter((t) => t.status === "done").length;
+    return { total, completed, percentage: total > 0 ? (completed / total) * 100 : 0 };
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Sub-tabs */}
-      <div className="flex gap-2 border-b border-[#867979]">
-        {[
-          { id: "features", label: "Features" },
-          { id: "tasks", label: "To-Do Lists" },
-          { id: "requirements", label: "Requirements" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveSubTab(tab.id as any)}
-            className={`px-6 py-3 font-medium transition ${
-              activeSubTab === tab.id
-                ? "text-[#171717] border-b-2 border-[#867979]"
-                : "text-[#171717]/70 hover:text-[#171717]"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <div className="space-y-8">
+
+      {/* Top Section: Requirements */}
+      <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]">
+        <h2 className="text-2xl font-light text-[#171717] mb-4">
+          Project Requirements
+        </h2>
+        <textarea
+          value={requirements}
+          onChange={(e) => setRequirements(e.target.value)}
+          placeholder="Define your project requirements, goals, and specifications here..."
+          rows={12}
+          className="w-full px-4 py-3 bg-white border-2 border-[#867979] rounded-xl focus:outline-none focus:border-[#867979] transition text-[#171717] placeholder-[#867979]/50 resize-none font-mono text-base"
+        />
       </div>
 
-      {/* Features Sub-tab */}
-      {activeSubTab === "features" && (
-        <div className="space-y-6">
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]">
-            <h2 className="text-2xl font-light text-[#171717] mb-4">
-              Add New Feature
-            </h2>
+      {/* Middle Section: Features with Nested Tasks */}
+      <div className="space-y-6">
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]">
+          <h2 className="text-2xl font-light text-[#171717] mb-4">
+            Add New Feature
+          </h2>
             <div className="space-y-4">
               <input
                 type="text"
@@ -952,48 +945,103 @@ function PlanningTab({
             </div>
           </div>
 
-          <div className="space-y-4">
-            {features.length === 0 ? (
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-12 border border-[#867979] text-center">
-                <p className="text-[#171717]/70">
-                  No features yet. Add one above.
-                </p>
-              </div>
-            ) : (
-              features
-                .sort((a, b) => a.priority - b.priority)
-                .map((feature) => (
-                  <FeatureCard
+        <div className="space-y-4">
+          {features.length === 0 ? (
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-12 border border-[#867979] text-center">
+              <p className="text-[#171717]/70">
+                No features yet. Add one above.
+              </p>
+            </div>
+          ) : (
+            features
+              .sort((a, b) => a.priority - b.priority)
+              .map((feature) => {
+                const taskStats = getFeatureTaskStats(feature);
+                return (
+                  <div
                     key={feature.id}
-                    feature={feature}
-                    isExpanded={expandedFeatureId === feature.id}
-                    isEditing={editingFeatureId === feature.id}
-                    onExpand={() =>
-                      setExpandedFeatureId(
-                        expandedFeatureId === feature.id ? null : feature.id
-                      )
-                    }
-                    onEdit={() => setEditingFeatureId(feature.id)}
-                    onCancelEdit={() => setEditingFeatureId(null)}
-                    onUpdate={(updates) => updateFeature(feature.id, updates)}
-                    onDelete={() => deleteFeature(feature.id)}
-                    onStatusChange={(status) =>
-                      updateFeature(feature.id, { status })
-                    }
-                  />
-                ))
-            )}
-          </div>
-        </div>
-      )}
+                    className="bg-white/70 backdrop-blur-sm rounded-2xl border border-[#867979] overflow-hidden"
+                  >
+                    {/* Feature Header */}
+                    <div className="p-6 border-b border-[#867979]/30">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-semibold text-[#171717] mb-2">
+                            {feature.name}
+                          </h3>
+                          <p className="text-[#171717]/80 mb-2">
+                            {feature.description}
+                          </p>
+                          {feature.impact && (
+                            <p className="text-sm text-[#171717]/70">
+                              Impact: {feature.impact}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`px-3 py-1 rounded text-xs font-medium ${
+                              feature.status === "idea"
+                                ? "bg-blue-100 text-blue-700"
+                                : feature.status === "planning"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : feature.status === "in-progress"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-gray-100 text-gray-700"
+                            }`}
+                          >
+                            {feature.status}
+                          </span>
+                          {taskStats.total > 0 && (
+                            <span className="text-sm text-[#171717]/70">
+                              {taskStats.completed}/{taskStats.total} tasks
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {taskStats.total > 0 && (
+                        <div className="mt-3">
+                          <div className="w-full bg-[#867979]/20 rounded-full h-2">
+                            <div
+                              className="bg-[#867979] h-2 rounded-full transition-all"
+                              style={{ width: `${taskStats.percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
-      {/* Tasks Sub-tab */}
-      {activeSubTab === "tasks" && (
-        <div className="space-y-6">
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]">
-            <h2 className="text-2xl font-light text-[#171717] mb-4">
-              Add New Task
-            </h2>
+                    {/* Feature Tasks */}
+                    {feature.tasks.length > 0 && (
+                      <div className="p-6 bg-[#867979]/5">
+                        <h4 className="text-sm font-medium text-[#171717]/70 mb-3">
+                          Tasks
+                        </h4>
+                        <div className="space-y-2">
+                          {feature.tasks.map((task) => (
+                            <TaskItem
+                              key={task.id}
+                              task={task}
+                              onUpdate={(updates) =>
+                                updateTask(task.id, updates, false)
+                              }
+                              onDelete={() => deleteTask(task.id, false)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+          )}
+        </div>
+
+        {/* Add Task Section */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]">
+          <h2 className="text-2xl font-light text-[#171717] mb-4">
+            Add New Task
+          </h2>
             <div className="space-y-4">
               <input
                 type="text"
@@ -1141,77 +1189,28 @@ function PlanningTab({
             </div>
           </div>
 
-          {/* Standalone Tasks */}
-          {project.tasks.length > 0 && (
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]">
-              <h3 className="text-xl font-light text-[#171717] mb-4">
-                Standalone Tasks
-              </h3>
-              <div className="space-y-2">
-                {project.tasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onUpdate={(updates) => updateTask(task.id, updates, true)}
-                    onDelete={() => deleteTask(task.id, true)}
-                  />
-                ))}
-              </div>
+        {/* Standalone Tasks Section */}
+        {project.tasks.length > 0 && (
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]">
+            <h3 className="text-xl font-light text-[#171717] mb-4">
+              Standalone Tasks
+            </h3>
+            <div className="space-y-2">
+              {project.tasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onUpdate={(updates) => updateTask(task.id, updates, true)}
+                  onDelete={() => deleteTask(task.id, true)}
+                />
+              ))}
             </div>
-          )}
+          </div>
+        )}
+      </div>
 
-          {/* Feature Tasks */}
-          {features.map((feature) =>
-            feature.tasks.length > 0 ? (
-              <div
-                key={feature.id}
-                className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]"
-              >
-                <h3 className="text-xl font-light text-[#171717] mb-4">
-                  {feature.name} Tasks
-                </h3>
-                <div className="space-y-2">
-                  {feature.tasks.map((task) => (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      onUpdate={(updates) =>
-                        updateTask(task.id, updates, false)
-                      }
-                      onDelete={() => deleteTask(task.id, false)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : null
-          )}
-
-          {project.tasks.length === 0 &&
-            features.every((f) => f.tasks.length === 0) && (
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-12 border border-[#867979] text-center">
-                <p className="text-[#171717]/70">
-                  No tasks yet. Add one above.
-                </p>
-              </div>
-            )}
-        </div>
-      )}
-
-      {/* Requirements Sub-tab */}
-      {activeSubTab === "requirements" && (
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]">
-          <h2 className="text-2xl font-light text-[#171717] mb-4">
-            Project Requirements
-          </h2>
-          <textarea
-            value={requirements}
-            onChange={(e) => setRequirements(e.target.value)}
-            placeholder="Define your project requirements, goals, and specifications here..."
-            rows={20}
-            className="w-full px-4 py-3 bg-white border-2 border-[#867979] rounded-xl focus:outline-none focus:border-[#867979] transition text-[#171717] placeholder-[#867979]/50 resize-none font-mono text-base"
-          />
-        </div>
-      )}
+      {/* Bottom Section: Diagrams */}
+      <DiagramSection project={project} />
     </div>
   );
 }
@@ -2553,6 +2552,172 @@ function ThoughtsTab({
               )}
             </div>
           ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Diagram Section Component
+function DiagramSection({ project }: { project: Project }) {
+  const features = project.impactPlan?.features || [];
+  const allTasks = [
+    ...(project.tasks || []),
+    ...(features.flatMap((f) => f.tasks || [])),
+  ];
+
+  // Feature status distribution
+  const statusCounts = {
+    idea: features.filter((f) => f.status === "idea").length,
+    planning: features.filter((f) => f.status === "planning").length,
+    "in-progress": features.filter((f) => f.status === "in-progress").length,
+    completed: features.filter((f) => f.status === "completed").length,
+  };
+
+  const totalFeatures = features.length;
+  const totalTasks = allTasks.length;
+  const completedTasks = allTasks.filter((t) => t.status === "done").length;
+
+  if (totalFeatures === 0 && totalTasks === 0) {
+    return null;
+  }
+
+  return (
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#867979]">
+      <h2 className="text-2xl font-light text-[#171717] mb-6">Visualizations</h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Feature Status Overview */}
+        {totalFeatures > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold text-[#171717] mb-4">
+              Feature Status Overview
+            </h3>
+            <div className="space-y-3">
+              {Object.entries(statusCounts).map(([status, count]) => {
+                if (count === 0) return null;
+                const percentage = (count / totalFeatures) * 100;
+                return (
+                  <div key={status}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-[#171717]/80 capitalize">
+                        {status.replace("-", " ")}
+                      </span>
+                      <span className="text-[#171717] font-medium">
+                        {count} ({Math.round(percentage)}%)
+                      </span>
+                    </div>
+                    <div className="w-full bg-[#867979]/20 rounded-full h-3">
+                      <div
+                        className={`h-3 rounded-full transition-all ${
+                          status === "idea"
+                            ? "bg-blue-500"
+                            : status === "planning"
+                            ? "bg-yellow-500"
+                            : status === "in-progress"
+                            ? "bg-green-500"
+                            : "bg-gray-500"
+                        }`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Task Progress */}
+        {totalTasks > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold text-[#171717] mb-4">
+              Task Progress
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-[#171717]/80">Overall Progress</span>
+                  <span className="text-[#171717] font-medium">
+                    {completedTasks}/{totalTasks} (
+                    {Math.round((completedTasks / totalTasks) * 100)}%)
+                  </span>
+                </div>
+                <div className="w-full bg-[#867979]/20 rounded-full h-4">
+                  <div
+                    className="bg-[#867979] h-4 rounded-full transition-all"
+                    style={{
+                      width: `${(completedTasks / totalTasks) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-700">
+                    {allTasks.filter((t) => t.status === "todo").length}
+                  </div>
+                  <div className="text-xs text-blue-600">Todo</div>
+                </div>
+                <div className="p-3 bg-yellow-100 rounded-lg">
+                  <div className="text-2xl font-bold text-yellow-700">
+                    {allTasks.filter((t) => t.status === "in-progress").length}
+                  </div>
+                  <div className="text-xs text-yellow-600">In Progress</div>
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <div className="text-2xl font-bold text-green-700">
+                    {completedTasks}
+                  </div>
+                  <div className="text-xs text-green-600">Done</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Feature Timeline (Simple) */}
+        {features.length > 0 && (
+          <div className="md:col-span-2">
+            <h3 className="text-lg font-semibold text-[#171717] mb-4">
+              Feature Timeline
+            </h3>
+            <div className="space-y-2">
+              {features
+                .sort((a, b) => a.priority - b.priority)
+                .map((feature, index) => (
+                  <div
+                    key={feature.id}
+                    className="flex items-center gap-4 p-3 bg-[#867979]/5 rounded-lg"
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#867979] text-white flex items-center justify-center font-semibold text-sm">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-[#171717]">
+                        {feature.name}
+                      </div>
+                      <div className="text-sm text-[#171717]/70">
+                        {feature.tasks.length} tasks
+                      </div>
+                    </div>
+                    <div
+                      className={`px-3 py-1 rounded text-xs font-medium ${
+                        feature.status === "idea"
+                          ? "bg-blue-100 text-blue-700"
+                          : feature.status === "planning"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : feature.status === "in-progress"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {feature.status}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
         )}
       </div>
     </div>

@@ -3,6 +3,25 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { checkAuth } from "@/lib/auth";
+import {
+  saveJournalToStorage,
+  loadJournalFromStorage,
+  listSavedJournals,
+  deleteJournal,
+  exportJournalToJSON,
+  importJournalFromJSON,
+  type SavedJournalMetadata,
+  getFileSystemTree,
+  getItemMetadata,
+  renameItem,
+  deleteItem,
+  moveItem,
+  createJournalFile,
+  migrateFlatStructureToFileSystem,
+  type JournalFile,
+  type JournalFileSystemItem,
+} from "@/lib/journalStorage";
+import JournalFileExplorer from "@/components/JournalFileExplorer";
 
 interface Project {
   id: string;
@@ -39,9 +58,14 @@ interface JournalSession {
     wordCount: number;
     lineCount: number;
   };
+  name?: string;
+  savedAt?: string;
+  isTemplate?: boolean;
+  currentLine?: string;
+  sessionStartTime?: string;
 }
 
-type ViewMode = "stream" | "organize" | "export";
+type ViewMode = "stream" | "organize" | "export" | "files";
 
 function JournalPageContent() {
   const router = useRouter();
@@ -59,6 +83,7 @@ function JournalPageContent() {
   const [isFocused, setIsFocused] = useState(true);
   const [sessionStartTime, setSessionStartTime] = useState<Date>(new Date());
   const [wordCount, setWordCount] = useState(0);
+  const [sessionDuration, setSessionDuration] = useState("0:00");
 
   // Organize state
   const [organizedThoughts, setOrganizedThoughts] = useState<
@@ -68,6 +93,8 @@ function JournalPageContent() {
   const [showExtractModal, setShowExtractModal] = useState(false);
   const [extractType, setExtractType] =
     useState<OrganizedThought["type"]>("note");
+  const [featureDescription, setFeatureDescription] = useState<string>("");
+  const [featureImpact, setFeatureImpact] = useState<string>("");
 
   // Export state
   const [exportItems, setExportItems] = useState<{
@@ -79,6 +106,33 @@ function JournalPageContent() {
     requirements: [],
     features: [],
   });
+
+  // Saved journals state
+  const [savedJournals, setSavedJournals] = useState<SavedJournalMetadata[]>(
+    []
+  );
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saveJournalName, setSaveJournalName] = useState("");
+  const [showImportConfirm, setShowImportConfirm] = useState(false);
+  const [pendingImport, setPendingImport] = useState<JournalSession | null>(
+    null
+  );
+
+  // File system state
+  const [currentFileId, setCurrentFileId] = useState<string | null>(null);
+  const [currentFileMetadata, setCurrentFileMetadata] =
+    useState<JournalFileSystemItem | null>(null);
+  const [currentFolderPath, setCurrentFolderPath] = useState<string>("/");
+  const [selectedProjectFilter, setSelectedProjectFilter] = useState<
+    string | null
+  >(null);
+
+  // Update save journal name when current file changes
+  useEffect(() => {
+    if (currentFileMetadata && currentFileMetadata.name) {
+      setSaveJournalName(currentFileMetadata.name);
+    }
+  }, [currentFileMetadata]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -96,6 +150,31 @@ function JournalPageContent() {
       }
     }
   }, []);
+
+  // Load saved journals list
+  useEffect(() => {
+    setSavedJournals(listSavedJournals());
+  }, []);
+
+  // Migrate flat structure to file system on first load
+  useEffect(() => {
+    migrateFlatStructureToFileSystem();
+  }, []);
+
+  // Load current file metadata when currentFileId changes
+  useEffect(() => {
+    if (currentFileId) {
+      const metadata = getItemMetadata(currentFileId);
+      setCurrentFileMetadata(metadata);
+      if (metadata && metadata.path) {
+        const pathParts = metadata.path.split("/");
+        pathParts.pop();
+        setCurrentFolderPath(pathParts.join("/") || "/");
+      }
+    } else {
+      setCurrentFileMetadata(null);
+    }
+  }, [currentFileId]);
 
   // Load saved journal session
   useEffect(() => {
@@ -148,6 +227,19 @@ function JournalPageContent() {
     setWordCount(words.length);
   }, [lines, currentLine]);
 
+  // Update session duration timer every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const diff = now.getTime() - sessionStartTime.getTime();
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      setSessionDuration(`${minutes}:${seconds.toString().padStart(2, "0")}`);
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, [sessionStartTime]);
+
   // Keep focus on input
   useEffect(() => {
     if (isFocused && inputRef.current && viewMode === "stream") {
@@ -162,6 +254,10 @@ function JournalPageContent() {
     }
   }, [lines, currentLine, viewMode]);
 
+  // Store selection range to preserve highlight
+  const [storedSelectionRange, setStoredSelectionRange] =
+    useState<Range | null>(null);
+
   // Handle text selection in stream view
   useEffect(() => {
     if (viewMode === "stream" && streamAreaRef.current) {
@@ -169,8 +265,16 @@ function JournalPageContent() {
         const selection = window.getSelection();
         if (selection && selection.toString().trim().length > 0) {
           setSelectedText(selection.toString().trim());
+          // Store the selection range to preserve highlight
+          if (selection.rangeCount > 0) {
+            setStoredSelectionRange(selection.getRangeAt(0).cloneRange());
+          }
         } else {
-          setSelectedText("");
+          // Only clear if selection is actually empty (not just clicking buttons)
+          if (!selection || selection.toString().trim().length === 0) {
+            setSelectedText("");
+            setStoredSelectionRange(null);
+          }
         }
       };
 
@@ -184,6 +288,21 @@ function JournalPageContent() {
       };
     }
   }, [viewMode]);
+
+  // Restore selection highlight when selectedText changes
+  useEffect(() => {
+    if (selectedText && storedSelectionRange && streamAreaRef.current) {
+      try {
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(storedSelectionRange);
+        }
+      } catch (e) {
+        // Selection might be invalid, ignore
+      }
+    }
+  }, [selectedText, storedSelectionRange]);
 
   // Check authentication on mount
   useEffect(() => {
@@ -221,9 +340,17 @@ function JournalPageContent() {
       type,
       selected: false,
       priority: type === "action-item" ? "medium" : undefined,
+      // For features, use description and impact fields
+      expanded: type === "feature" ? featureDescription : undefined,
+      category: type === "feature" ? featureImpact : undefined,
     };
     setOrganizedThoughts([...organizedThoughts, newThought]);
     setSelectedText("");
+    setStoredSelectionRange(null);
+    setFeatureDescription("");
+    setFeatureImpact("");
+    // Clear the selection highlight
+    window.getSelection()?.removeAllRanges();
     setShowExtractModal(false);
   };
 
@@ -351,12 +478,142 @@ function JournalPageContent() {
     }
   };
 
-  const getSessionDuration = () => {
-    const now = new Date();
-    const diff = now.getTime() - sessionStartTime.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  const handleSaveJournal = () => {
+    if (!saveJournalName.trim()) return;
+
+    const sessionData: JournalSession = {
+      id: currentFileId || Date.now().toString(),
+      projectId: selectedProjectId || undefined,
+      createdAt: currentFileId
+        ? (currentFileMetadata as JournalFile)?.createdAt ||
+          sessionStartTime.toISOString()
+        : sessionStartTime.toISOString(),
+      updatedAt: new Date().toISOString(),
+      rawThoughts: lines,
+      organizedThoughts,
+      metadata: {
+        duration: new Date().getTime() - sessionStartTime.getTime(),
+        wordCount,
+        lineCount: lines.length,
+      },
+      currentLine,
+      sessionStartTime: sessionStartTime.toISOString(),
+    };
+
+    const fileId = saveJournalToStorage(
+      saveJournalName,
+      sessionData,
+      currentFolderPath,
+      selectedProjectId || undefined
+    );
+    setCurrentFileId(fileId);
+    setSavedJournals(listSavedJournals());
+    setShowSaveModal(false);
+    setSaveJournalName("");
+  };
+
+  const handleLoadJournal = (id: string, asTemplate: boolean = false) => {
+    const journal = loadJournalFromStorage(id);
+    if (!journal) return;
+
+    if (asTemplate) {
+      // Load as template - reset session time and create new ID
+      setLines(journal.rawThoughts || []);
+      setOrganizedThoughts(journal.organizedThoughts || []);
+      setCurrentLine(journal.currentLine || "");
+      setSessionStartTime(new Date());
+      setCurrentFileId(null);
+    } else {
+      // Continue editing - load exact state
+      setLines(journal.rawThoughts || []);
+      setOrganizedThoughts(journal.organizedThoughts || []);
+      setCurrentLine(journal.currentLine || "");
+      if (journal.sessionStartTime) {
+        setSessionStartTime(new Date(journal.sessionStartTime));
+      }
+      setCurrentFileId(id);
+    }
+    setViewMode("stream");
+  };
+
+  const handleOpenFile = (file: JournalFile) => {
+    handleLoadJournal(file.id, false);
+  };
+
+  const handleDeleteJournal = (id: string) => {
+    if (confirm("Are you sure you want to delete this journal?")) {
+      deleteJournal(id);
+      setSavedJournals(listSavedJournals());
+    }
+  };
+
+  const handleExportJournal = () => {
+    const sessionData: JournalSession = {
+      id: Date.now().toString(),
+      projectId: selectedProjectId || undefined,
+      createdAt: sessionStartTime.toISOString(),
+      updatedAt: new Date().toISOString(),
+      rawThoughts: lines,
+      organizedThoughts,
+      metadata: {
+        duration: new Date().getTime() - sessionStartTime.getTime(),
+        wordCount,
+        lineCount: lines.length,
+      },
+      currentLine,
+      sessionStartTime: sessionStartTime.toISOString(),
+    };
+
+    const json = exportJournalToJSON(sessionData);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `journal-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportJournal = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const journal = importJournalFromJSON(text);
+      if (journal) {
+        setPendingImport(journal);
+        setShowImportConfirm(true);
+      } else {
+        alert("Failed to import journal. Invalid format.");
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ""; // Reset input
+  };
+
+  const confirmImport = () => {
+    if (!pendingImport) return;
+
+    if (
+      confirm("This will overwrite your current journal session. Continue?")
+    ) {
+      setLines(pendingImport.rawThoughts || []);
+      setOrganizedThoughts(pendingImport.organizedThoughts || []);
+      setCurrentLine(pendingImport.currentLine || "");
+      if (pendingImport.sessionStartTime) {
+        setSessionStartTime(new Date(pendingImport.sessionStartTime));
+      } else {
+        setSessionStartTime(new Date());
+      }
+      setViewMode("stream");
+    }
+
+    setShowImportConfirm(false);
+    setPendingImport(null);
   };
 
   const selectedProject = projects.find((p) => p.id === selectedProjectId);
@@ -382,28 +639,55 @@ function JournalPageContent() {
             ← Back to Dashboard
           </button>
           <div className="h-6 w-px bg-[#867979]/30" />
-          <select
-            value={selectedProjectId || ""}
-            onChange={(e) => setSelectedProjectId(e.target.value || null)}
-            className="bg-[#171717] border border-[#867979]/30 rounded-lg px-4 py-2 text-[#D0CCCC] focus:outline-none focus:border-[#867979]"
-          >
-            <option value="">General Journal</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-          </select>
-          {selectedProject && (
-            <span className="text-sm text-[#867979]">
-              {selectedProject.name}
-            </span>
+          {viewMode !== "files" && (
+            <select
+              value={selectedProjectId || ""}
+              onChange={(e) => setSelectedProjectId(e.target.value || null)}
+              className="bg-[#171717] border border-[#867979]/30 rounded-lg px-4 py-2 text-[#D0CCCC] focus:outline-none focus:border-[#867979]"
+            >
+              <option value="">General Journal</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {viewMode === "files" && (
+            <select
+              value={selectedProjectFilter || "all"}
+              onChange={(e) => setSelectedProjectFilter(e.target.value || null)}
+              className="bg-[#171717] border border-[#867979]/30 rounded-lg px-4 py-2 text-[#D0CCCC] focus:outline-none focus:border-[#867979]"
+            >
+              <option value="all">All Projects</option>
+              <option value="general">General</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {currentFileMetadata && viewMode !== "files" && (
+            <>
+              <div className="h-6 w-px bg-[#867979]/30" />
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-[#867979]">
+                  {currentFileMetadata.name}
+                </span>
+                {currentFileMetadata.path && (
+                  <span className="text-xs text-[#867979]/70">
+                    {currentFileMetadata.path}
+                  </span>
+                )}
+              </div>
+            </>
           )}
         </div>
 
         <div className="flex items-center gap-6">
           <div className="text-sm text-[#867979]">
-            {wordCount} words · {lines.length} lines · {getSessionDuration()}
+            {wordCount} words · {lines.length} lines · {sessionDuration}
           </div>
           <div className="flex gap-2">
             <button
@@ -437,6 +721,40 @@ function JournalPageContent() {
             >
               Export
             </button>
+            <button
+              onClick={() => setViewMode("files")}
+              className={`px-4 py-2 rounded-lg transition ${
+                viewMode === "files"
+                  ? "bg-[#867979] text-white"
+                  : "text-[#D0CCCC] hover:bg-[#867979]/20"
+              }`}
+            >
+              Files
+            </button>
+            {viewMode !== "files" && currentFileId && (
+              <button
+                onClick={() => setViewMode("files")}
+                className="px-4 py-2 rounded-lg bg-[#867979]/30 hover:bg-[#867979]/40 text-[#D0CCCC] transition text-sm"
+              >
+                Back to Files
+              </button>
+            )}
+            {(viewMode === "stream" || viewMode === "organize") && (
+              <>
+                <button
+                  onClick={() => setShowSaveModal(true)}
+                  className="px-4 py-2 rounded-lg bg-[#867979]/30 hover:bg-[#867979]/40 text-[#D0CCCC] transition"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={handleExportJournal}
+                  className="px-4 py-2 rounded-lg bg-[#867979]/30 hover:bg-[#867979]/40 text-[#D0CCCC] transition"
+                >
+                  Export JSON
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -448,34 +766,50 @@ function JournalPageContent() {
           {selectedText && (
             <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 bg-[#867979] rounded-lg p-2 flex gap-2 shadow-lg">
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   setExtractType("action-item");
                   setShowExtractModal(true);
                 }}
+                onMouseDown={(e) => e.preventDefault()}
                 className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded text-sm transition"
               >
                 Extract as Action
               </button>
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   setExtractType("requirement");
                   setShowExtractModal(true);
                 }}
+                onMouseDown={(e) => e.preventDefault()}
                 className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded text-sm transition"
               >
                 Extract as Requirement
               </button>
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   setExtractType("feature");
                   setShowExtractModal(true);
                 }}
+                onMouseDown={(e) => e.preventDefault()} // Prevent selection loss
                 className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded text-sm transition"
               >
                 Extract as Feature
               </button>
               <button
-                onClick={() => setSelectedText("")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSelectedText("");
+                  setStoredSelectionRange(null);
+                  window.getSelection()?.removeAllRanges();
+                }}
+                onMouseDown={(e) => e.preventDefault()}
                 className="px-2 py-1 text-[#867979] hover:text-white"
               >
                 ×
@@ -798,16 +1132,215 @@ function JournalPageContent() {
         </div>
       )}
 
-      {/* Extract Modal */}
-      {showExtractModal && selectedText && (
+      {/* Files View */}
+      {viewMode === "files" && (
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-white">
+                Journal Files
+              </h2>
+              <div className="flex gap-2">
+                <label className="px-4 py-2 bg-[#867979] hover:bg-[#756868] rounded-lg cursor-pointer transition">
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleImportJournal}
+                    className="hidden"
+                  />
+                  Import JSON
+                </label>
+                <button
+                  onClick={() => {
+                    setLines([]);
+                    setOrganizedThoughts([]);
+                    setCurrentLine("");
+                    setCurrentFileId(null);
+                    setSessionStartTime(new Date());
+                    setViewMode("stream");
+                    // Set selected project based on filter if in files view
+                    if (
+                      selectedProjectFilter &&
+                      selectedProjectFilter !== "all" &&
+                      selectedProjectFilter !== "general"
+                    ) {
+                      setSelectedProjectId(selectedProjectFilter);
+                    } else if (selectedProjectFilter === "general") {
+                      setSelectedProjectId(null);
+                    }
+                  }}
+                  className="px-4 py-2 bg-[#867979] hover:bg-[#756868] rounded-lg transition"
+                >
+                  New Journal
+                </button>
+              </div>
+            </div>
+
+            <JournalFileExplorer
+              currentPath={currentFolderPath}
+              onPathChange={setCurrentFolderPath}
+              onOpenFile={handleOpenFile}
+              onRename={(id, name, type) => {
+                renameItem(id, name, type);
+                setSavedJournals(listSavedJournals());
+                if (id === currentFileId) {
+                  const metadata = getItemMetadata(id);
+                  setCurrentFileMetadata(metadata);
+                }
+              }}
+              onDelete={(id, type) => {
+                if (id === currentFileId) {
+                  setCurrentFileId(null);
+                  setCurrentFileMetadata(null);
+                }
+                deleteItem(id, type);
+                setSavedJournals(listSavedJournals());
+              }}
+              selectedProjectFilter={selectedProjectFilter}
+              projects={projects}
+              currentFileId={currentFileId}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Save Modal */}
+      {showSaveModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[#171717] border border-[#867979] rounded-lg p-6 max-w-md w-full">
             <h3 className="text-xl font-semibold mb-4 text-white">
+              {currentFileId ? "Save Journal" : "Save New Journal"}
+            </h3>
+            {currentFileMetadata && (
+              <p className="text-sm text-[#867979] mb-2">
+                Current file: {currentFileMetadata.name}
+              </p>
+            )}
+            <p className="text-sm text-[#867979] mb-4">
+              Saving to:{" "}
+              {currentFolderPath === "/" ? "Root" : currentFolderPath}
+            </p>
+            <input
+              type="text"
+              value={saveJournalName}
+              onChange={(e) => setSaveJournalName(e.target.value)}
+              placeholder={currentFileMetadata?.name || "Journal name..."}
+              className="w-full px-4 py-3 bg-[#171717] border border-[#867979] rounded-lg text-[#D0CCCC] focus:outline-none focus:border-[#867979] mb-4"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSaveJournal();
+                } else if (e.key === "Escape") {
+                  setShowSaveModal(false);
+                  setSaveJournalName("");
+                }
+              }}
+              autoFocus
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={handleSaveJournal}
+                disabled={!saveJournalName.trim()}
+                className="flex-1 px-4 py-2 bg-[#867979] hover:bg-[#756868] rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {currentFileId ? "Update" : "Save"}
+              </button>
+              <button
+                onClick={() => {
+                  setShowSaveModal(false);
+                  setSaveJournalName("");
+                }}
+                className="flex-1 px-4 py-2 border border-[#867979] rounded hover:bg-[#867979]/20 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import Confirmation Modal */}
+      {showImportConfirm && pendingImport && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#171717] border border-[#867979] rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-xl font-semibold mb-4 text-white">
+              Import Journal
+            </h3>
+            <p className="text-[#D0CCCC] mb-4">
+              This will overwrite your current journal session. Are you sure you
+              want to continue?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={confirmImport}
+                className="flex-1 px-4 py-2 bg-[#867979] hover:bg-[#756868] rounded transition"
+              >
+                Import
+              </button>
+              <button
+                onClick={() => {
+                  setShowImportConfirm(false);
+                  setPendingImport(null);
+                }}
+                className="flex-1 px-4 py-2 border border-[#867979] rounded hover:bg-[#867979]/20 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Extract Modal */}
+      {showExtractModal && selectedText && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#171717] border border-[#867979] rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-semibold mb-4 text-white">
               Extract as {extractType.replace("-", " ")}
             </h3>
-            <p className="text-[#D0CCCC] mb-4 p-3 bg-[#867979]/10 rounded">
-              {selectedText}
-            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-[#D0CCCC] mb-2">
+                {extractType === "feature"
+                  ? "Feature Name"
+                  : extractType === "requirement"
+                  ? "Requirement"
+                  : extractType === "action-item"
+                  ? "Action Item"
+                  : "Text"}
+              </label>
+              <p className="text-[#D0CCCC] p-3 bg-[#867979]/10 rounded">
+                {selectedText}
+              </p>
+            </div>
+
+            {extractType === "feature" && (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-[#D0CCCC] mb-2">
+                    Description (optional)
+                  </label>
+                  <textarea
+                    value={featureDescription}
+                    onChange={(e) => setFeatureDescription(e.target.value)}
+                    placeholder="Add more details about this feature..."
+                    rows={3}
+                    className="w-full px-4 py-3 bg-[#171717] border border-[#867979] rounded-lg text-[#D0CCCC] focus:outline-none focus:border-[#867979] resize-none"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-[#D0CCCC] mb-2">
+                    Impact (optional)
+                  </label>
+                  <textarea
+                    value={featureImpact}
+                    onChange={(e) => setFeatureImpact(e.target.value)}
+                    placeholder="How does this create impact?"
+                    rows={2}
+                    className="w-full px-4 py-3 bg-[#171717] border border-[#867979] rounded-lg text-[#D0CCCC] focus:outline-none focus:border-[#867979] resize-none"
+                  />
+                </div>
+              </>
+            )}
+
             <div className="flex gap-3">
               <button
                 onClick={() => extractThought(selectedText, extractType)}
@@ -819,6 +1352,8 @@ function JournalPageContent() {
                 onClick={() => {
                   setShowExtractModal(false);
                   setSelectedText("");
+                  setFeatureDescription("");
+                  setFeatureImpact("");
                 }}
                 className="flex-1 px-4 py-2 border border-[#867979] rounded hover:bg-[#867979]/20 transition"
               >
